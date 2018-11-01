@@ -62,7 +62,6 @@ app.use(function (err, req, res, next) {
   }
 
   if (err) {
-    new Error()
     appLogger.error(JSON.stringify({
       name: err.name,
       message: err.message,

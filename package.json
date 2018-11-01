@@ -1,0 +1,38 @@
+{
+  "name": "pi-dashboard",
+  "author": "Kewell",
+  "version": "1.0.0",
+  "license": "Private",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:kewell-tsao/pi-dashboard.git"
+  },
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node app.js",
+    "start:dev": "cross-env NODE_ENV=development node app.js",
+    "start:pm2": "cross-env NODE_ENV=production pm2 start app.js"
+  },
+  "dependencies": {
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "cross-env": "^5.2.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.2",
+    "log4js": "^3.0.6",
+    "serve-favicon": "^2.5.0"
+  }
+}

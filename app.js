@@ -33,9 +33,13 @@ app.get('/', function (req, res, next) {
     if (req.query['ajax']) {
       res.json(deviceInfo)
     } else {
-      res.render('index', {
-        device: deviceInfo
-      })
+      try {
+        res.render('index', {
+          device: deviceInfo
+        })
+      } catch (err){
+        return Promise.reject(err)
+      }
     }
   }).catch(function (err) {
     next(err)

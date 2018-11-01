@@ -2,6 +2,7 @@ const _ = require('lodash')
 const fs = require('fs')
 const os = require('os')
 const dns = require('dns')
+const exec = require('child_process').exec
 const Promise = require('bluebird')
 
 function getDeviceInfo (req) {
@@ -24,19 +25,22 @@ function getDeviceInfo (req) {
     hostname: os.hostname,
     hostip: '',
     yourip: get_request_ip(req),
-    uname: get_uname(),
+    uname: '',
     uptime: os.uptime(),
     os: get_os(),
     cpu: {},
     mem: {},
     load_avg: [0, 0, 0, '0/0'],
-    disk: get_disk(),
+    disk: {},
     net: {}
   }
 
   let tasks = []
   tasks.push(get_hostip(req.hostname).then(function (hostip) {
     device.hostip = hostip
+  }))
+  tasks.push(get_uname().then(function (uname) {
+    device.uname = uname
   }))
   tasks.push(get_cpu().then(function (cpu) {
     device.cpu = cpu
@@ -46,6 +50,9 @@ function getDeviceInfo (req) {
   }))
   tasks.push(get_load_avg().then(function (load_avg) {
     device.load_avg = load_avg
+  }))
+  tasks.push(get_disk().then(function (disk) {
+    device.disk = disk
   }))
   tasks.push(get_net().then(function (net) {
     device.net = net
@@ -99,8 +106,19 @@ function get_request_ip (req) {
 }
 
 function get_uname () {
-  // TODO: !!
-  return ''
+  return new Promise(function (resolve, reject) {
+    let platform = os.platform()
+    if (platform !== 'linux') {
+      return resolve(platform)
+    }
+    exec('uname -a', function (error, stdout, stderr) {
+      if (error) {
+        resolve(platform)
+      } else {
+        resolve(stdout)
+      }
+    })
+  })
 }
 
 function get_os () {
@@ -121,18 +139,41 @@ function get_cpu () {
       nice: cpus[0].times.nice,
       sys: cpus[0].times.sys,
       idle: cpus[0].times.idle,
+      iowait: 0,
       irq: cpus[0].times.irq,
       softirq: 0
     },
     temp: 0
   }
-  return new Promise(function (resolve, reject) {
-    fs.readFile('/sys/class/thermal/thermal_zone0/temp', 'utf8', function (err, data) {
-      if (!err) {
-        cpu.temp = parseInt(data)
-      }
-      resolve(cpu)
+  return Promise.all([
+    new Promise(function (resolve, reject) {
+      fs.readFile('/proc/stat', 'utf8', function (err, data) {
+        if (!err) {
+          const regex = /^[a-zA-Z0-9]+\s+(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s(\d+)\s/s
+          let matches = regex.exec(data)
+          if (matches) {
+            cpu.stat.user = matches[1]
+            cpu.stat.nice = matches[2]
+            cpu.stat.sys = matches[3]
+            cpu.stat.idle = matches[4]
+            cpu.stat.iowait = matches[5]
+            cpu.stat.irq = matches[6]
+            cpu.stat.softirq = matches[7]
+          }
+        }
+        resolve(cpu)
+      })
+    }),
+    new Promise(function (resolve, reject) {
+      fs.readFile('/sys/class/thermal/thermal_zone0/temp', 'utf8', function (err, data) {
+        if (!err) {
+          cpu.temp = parseInt(data)
+        }
+        resolve(cpu)
+      })
     })
+  ]).then(function () {
+    return Promise.resolve(cpu)
   })
 }
 
@@ -197,14 +238,32 @@ function get_load_avg () {
 }
 
 function get_disk () {
-  // TODO: !!
   let disk = {
     total: 0,
-    'free': 0,
+    free: 0,
     used: 0,
     percent: 0,
   }
-  return disk
+  return new Promise(function (resolve, reject) {
+    let platform = os.platform()
+    if (platform !== 'linux') {
+      return resolve(disk)
+    }
+
+    exec('df --local --total --block-size=K', function (error, stdout, stderr) {
+      if (!error) {
+        const regex = /^total\s+(\d+)K\s+(\d+)K\s+(\d+)K\s+(\d+)%/m
+        let matches = regex.exec(stdout)
+        if (matches) {
+          disk.total = _.round(parseInt(matches[1]) / (1024 * 1024), 3)
+          disk.used = _.round(parseInt(matches[2]) / (1024 * 1024), 3)
+          disk.free = _.round(parseInt(matches[3]) / (1024 * 1024), 3)
+          disk.percent = parseInt(matches[3]) / 100
+        }
+      }
+      resolve(disk)
+    })
+  })
 }
 
 function get_net () {

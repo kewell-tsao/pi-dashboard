@@ -150,7 +150,7 @@ function get_mem () {
       free: 0,
       percent: 0
     },
-    real: {
+    swap: {
       total: 0,
       used: 0,
       free: 0,

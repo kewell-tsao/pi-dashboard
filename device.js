@@ -19,7 +19,7 @@ function getDeviceInfo (req) {
         ]
       }
     },
-    version: '1.0.0',
+    version: '1.1.0',
     model: get_device_model(),
     user: get_current_user(),
     hostname: os.hostname,

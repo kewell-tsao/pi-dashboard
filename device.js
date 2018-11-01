@@ -129,7 +129,7 @@ function get_cpu () {
   return new Promise(function (resolve, reject) {
     fs.readFile('/sys/class/thermal/thermal_zone0/temp', 'utf8', function (err, data) {
       if (!err) {
-        cpu.temp = data
+        cpu.temp = parseInt(data)
       }
       resolve(cpu)
     })

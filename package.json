@@ -20,7 +20,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node app.js",
     "start:dev": "cross-env NODE_ENV=development node app.js",
-    "start:pm2": "cross-env NODE_ENV=production pm2 start app.js"
+    "start:pm2": "cross-env NODE_ENV=production pm2 start app.js --name=\"pi-dashboard\""
   },
   "dependencies": {
     "lodash": "^4.17.11"

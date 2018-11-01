@@ -221,9 +221,9 @@ function get_net () {
         for (let i = 2; i < lines.length; i++) {
           let matches = reg.exec(lines[i])
           net.interfaces.push({
-            name: $info[1],
-            total_in: $info[2],
-            total_out: $info[10]
+            name: matches[1],
+            total_in: matches[2],
+            total_out: matches[10]
           })
         }
       }

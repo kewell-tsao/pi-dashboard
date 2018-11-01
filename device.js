@@ -115,7 +115,7 @@ function get_uname () {
       if (error) {
         resolve(platform)
       } else {
-        resolve(stdout)
+        resolve(_.replace(stdout, '\n', ''))
       }
     })
   })

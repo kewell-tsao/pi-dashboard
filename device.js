@@ -216,7 +216,6 @@ function get_net () {
     fs.readFile('/proc/net/dev', 'utf8', function (err, data) {
       if (!err) {
         let lines = _.split(data, '\n')
-        net.count = lines.length - 2
         let reg = /([^\s]+):[\s]{0,}(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/
         for (let i = 2; i < lines.length; i++) {
           let matches = reg.exec(lines[i])
@@ -228,6 +227,7 @@ function get_net () {
             })
           }
         }
+        net.count = net.interfaces.length
       }
       resolve(net)
     })

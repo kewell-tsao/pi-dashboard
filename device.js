@@ -220,11 +220,13 @@ function get_net () {
         let reg = /([^\s]+):[\s]{0,}(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)/
         for (let i = 2; i < lines.length; i++) {
           let matches = reg.exec(lines[i])
-          net.interfaces.push({
-            name: matches[1],
-            total_in: matches[2],
-            total_out: matches[10]
-          })
+          if (matches) {
+            net.interfaces.push({
+              name: matches[1],
+              total_in: matches[2],
+              total_out: matches[10]
+            })
+          }
         }
       }
       resolve(net)

@@ -131,7 +131,7 @@ function get_os () {
 function get_cpu () {
   let cpus = os.cpus()
   let cpu = {
-    freq: cpus[0].speed,
+    freq: cpus[0].speed * 1000,
     count: cpus.length,
     model: cpus.length > 1 ? (cpus[0].model + ' x' + cpus.length) : cpus[0].model,
     stat: {
@@ -258,7 +258,7 @@ function get_disk () {
           disk.total = _.round(parseInt(matches[1]) / (1024 * 1024), 3)
           disk.used = _.round(parseInt(matches[2]) / (1024 * 1024), 3)
           disk.free = _.round(parseInt(matches[3]) / (1024 * 1024), 3)
-          disk.percent = parseInt(matches[3]) / 100
+          disk.percent = parseInt(matches[4]) / 100
         }
       }
       resolve(disk)

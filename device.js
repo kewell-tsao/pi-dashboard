@@ -258,7 +258,7 @@ function get_disk () {
           disk.total = _.round(parseInt(matches[1]) / (1024 * 1024), 3)
           disk.used = _.round(parseInt(matches[2]) / (1024 * 1024), 3)
           disk.free = _.round(parseInt(matches[3]) / (1024 * 1024), 3)
-          disk.percent = parseInt(matches[4]) / 100
+          disk.percent = parseInt(matches[4])
         }
       }
       resolve(disk)
